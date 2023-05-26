@@ -13,6 +13,7 @@ google-generativeai = "*"
 pinecone-client = "*"
 openai = "*"
 tiktoken = "*"
+google-cloud-aiplatform = "*"
 
 [dev-packages]
 
