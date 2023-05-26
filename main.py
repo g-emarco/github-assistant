@@ -7,3 +7,4 @@ from langchain.schema import (
 if __name__ == "__main__":
     chat = ChatGooglePalm()
     res = chat(messages=[HumanMessage(content="write me a poem about trees")])
+    print(res)
