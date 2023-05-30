@@ -47,15 +47,16 @@ def ingest_docs():
     print("****Loading to vectorestore done ***")
 
 
-def ingest_docs_g():
-    to_path = "./wordblend-ai"
-    repo = Repo.clone_from(
-        "https://github.com/g-emarco/wordblend-ai", to_path=to_path, branch="main"
-    )
+def ingest_docs_g(repo_url: str) -> None:
+    print(f"***** going to clone {repo_url}")
+    to_path = "./repo_to_embed"
+    repo = Repo.clone_from(repo_url, to_path=to_path, branch="main")
     loader = GitLoader(repo_path=to_path)
     raw_documents = loader.load()
 
     print(f"loaded {len(raw_documents)} documents")
+    print(f"splitting documents to chunks")
+
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1200,
         chunk_overlap=150,
@@ -72,14 +73,11 @@ def ingest_docs_g():
         )
 
     documents = text_splitter.split_documents(raw_documents)
-    os.environ[
-        "GOOGLE_APPLICATION_CREDENTIALS"
-    ] = "/Users/emarco/GithubProjects/github-assistant/vertex-sa-key.json"
-
     embeddings = VertexAIEmbeddings()  # Dimention 768
-    print(f"Going to add {len(documents)} to Pinecone")
+    print(f"Going to add {len(documents)} chunks to vectorstore")
     chunk_size = 5
     for i in range(0, len(documents), chunk_size):
+        print(f"iteration {i}/{len(documents)/chunk_size}...")
         chunked_documents = documents[i : i + chunk_size]
         Pinecone.from_documents(
             chunked_documents, embeddings, index_name=os.environ["PINECONE_INDEX_NAME"]
@@ -88,4 +86,4 @@ def ingest_docs_g():
 
 
 if __name__ == "__main__":
-    ingest_docs()
+    ingest_docs_g(repo_url="https://github.com/g-emarco/wordblend-ai")

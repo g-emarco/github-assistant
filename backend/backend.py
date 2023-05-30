@@ -33,12 +33,9 @@ def run_llm(query: str, chat_history: List[Dict[str, Any]] = []):
 
 
 def run_g_llm(query: str, chat_history: List[Dict[str, Any]] = []):
-    os.environ[
-        "GOOGLE_APPLICATION_CREDENTIALS"
-    ] = "/home/user/github-assistant/vertex-sa-key.json"
     embeddings = VertexAIEmbeddings()  # Dimention 768
 
-    docsearch = Pinecone.from_existing_index(
+    vectorstore = Pinecone.from_existing_index(
         embedding=embeddings,
         index_name=os.environ["PINECONE_INDEX_NAME"],
     )
@@ -48,6 +45,6 @@ def run_g_llm(query: str, chat_history: List[Dict[str, Any]] = []):
     )
 
     qa = ConversationalRetrievalChain.from_llm(
-        llm=chat, retriever=docsearch.as_retriever(), return_source_documents=True
+        llm=chat, retriever=vectorstore.as_retriever(), return_source_documents=True
     )
     return qa({"question": query, "chat_history": chat_history})
