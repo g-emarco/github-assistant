@@ -1,0 +1,23 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: Build Image
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      docker build . -t us-east1-docker.pkg.dev/$PROJECT_ID/webapp/doc-helper:latest \
+      && docker push us-east1-docker.pkg.dev/$PROJECT_ID/webapp/doc-helper:latest 
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  id: Deploy API
+  args: ['run', 'deploy', $PROJECT_ID,
+             --image=us-east1.pkg.dev/$PROJECT_ID/webapp/doc-helper:latest,
+             '--region=us-east1', '--service-account=firebase-adminsdk-jfp0o@wordblend-ai.iam.gserviceaccount.com',
+              '--allow-unauthenticated',
+              'GCP_PROJECT=????',
+              '--set-secrets=PALM2_API_KEY=PALM2_API_KEY:latest, PINECONE_API_KEY=PINECONE_API_KEY:latest',PINECONE_ENVIRONMENT_REGION=PINECONE_ENVIRONMENT_REGION:latest]
+  waitFor: [ 'Build' ]
+
+images:
+- 'doc-helper-docker.pkg.dev/$PROJECT_ID/webapp/doc-helper:latest'
