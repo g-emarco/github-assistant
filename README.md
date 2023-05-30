@@ -56,7 +56,7 @@ Install dependencies
 Start the Streamlit server
 
 ```bash
-  streamlit run main.py
+  streamlit run app.py
 ```
 
 NOTE: When running locally make sure `GOOGLE_APPLICATION_CREDENTIALS` is set to a service account with permissions to use VertexAI
