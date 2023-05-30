@@ -3,6 +3,13 @@ from streamlit_chat import message
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.add_vertical_space import add_vertical_space
 from backend.backend import run_llm
+import os
+
+
+def get_text(instruction: str = "You: "):
+    input_text = st.text_input(instruction, "", key=f"input-{instruction}")
+    return input_text
+
 
 st.set_page_config(page_title="Codepen - An LLM-powered Repository SideKick")
 with st.sidebar:
@@ -21,6 +28,12 @@ with st.sidebar:
     """
     )
     add_vertical_space(5)
+    api_key_container = st.container()
+    with api_key_container:
+        palm_api_key = get_text(instruction="PALM2_API_KEY")
+        if palm_api_key:
+            os.environ["PALM_2_API_KEY"]
+
     st.write("Made by [Eden Marco](https://www.linkedin.com/in/eden-marco/)")
 
 if "generated" not in st.session_state:
@@ -36,13 +49,8 @@ colored_header(label="", description="", color_name="blue-30")
 response_container = st.container()
 
 
-def get_text():
-    input_text = st.text_input("You: ", "", key="input")
-    return input_text
-
-
 with input_container:
-    user_input = get_text()
+    user_input = get_text(instruction="You: ")
 
 
 ## Conditional display of AI generated responses as a function of user provided prompts
