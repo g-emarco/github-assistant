@@ -28,11 +28,11 @@ with st.sidebar:
     """
     )
     add_vertical_space(5)
-    api_key_container = st.container()
-    with api_key_container:
-        palm_api_key = get_text(instruction="PALM2_API_KEY")
-        if palm_api_key:
-            os.environ["PALM_2_API_KEY"]
+    # api_key_container = st.container()
+    # with api_key_container:
+    #     palm_api_key = get_text(instruction="PALM2_API_KEY")
+    #     if palm_api_key:
+    #         os.environ["PALM_2_API_KEY"]
 
     st.write("Made by [Eden Marco](https://www.linkedin.com/in/eden-marco/)")
 
