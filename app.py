@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_chat import message
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.add_vertical_space import add_vertical_space
-from backend.backend import run_llm, run_g_llm
+from backend.backend import run_llm, run_llm
 import os
 
 
@@ -57,7 +57,7 @@ with input_container:
 with response_container:
     if user_input:
         with st.spinner("Generating response..."):
-            response = run_g_llm(
+            response = run_llm(
                 query=user_input, chat_history=st.session_state["chat_history"]
             )
             st.session_state.past.append(user_input)
