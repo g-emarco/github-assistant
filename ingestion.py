@@ -6,6 +6,7 @@ from langchain.embeddings import OpenAIEmbeddings, VertexAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 import pinecone
+from langchain.vectorstores.pgvector import PGVector
 
 pinecone.init(
     api_key=os.environ["PINECONE_API_KEY"],
@@ -13,7 +14,7 @@ pinecone.init(
 )
 
 
-def ingest_docs(repo_url: str, vendor: str = "google") -> None:
+def ingest_docs(repo_url: str, vendor: str = "google", db: str = "postgres") -> None:
     to_path = "./repo_to_embed"
     repo = Repo.clone_from(repo_url, to_path=to_path, branch="main")
     loader = GitLoader(repo_path=to_path)
@@ -47,11 +48,26 @@ def ingest_docs(repo_url: str, vendor: str = "google") -> None:
     for i in range(0, len(documents), chunk_size):
         print(f"iteration {i}/{len(documents)/chunk_size}...")
         chunked_documents = documents[i : i + chunk_size]
-        Pinecone.from_documents(
-            chunked_documents, embeddings, index_name=os.environ["PINECONE_INDEX_NAME"]
-        )
+        if db == "postgres":
+            PGVector.from_documents(
+                embedding=embeddings,
+                documents=chunked_documents,
+                collection_name=os.environ["COLLECTION_NAME"],
+                connection_string=os.environ["DB_URL"],
+            )
+        else:
+            Pinecone.from_documents(
+                chunked_documents,
+                embeddings,
+                collection_name=os.environ["COLLECTION_NAME"],
+                connection_string=os.environ["DB_URL"],
+            )
     print("****Loading to vectorestore done ***")
 
 
 if __name__ == "__main__":
-    ingest_docs(repo_url="https://github.com/g-emarco/wordblend-ai")
+    ingest_docs(
+        repo_url="https://github.com/g-emarco/wordblend-ai",
+        vendor="google",
+        db="postrgres",
+    )
